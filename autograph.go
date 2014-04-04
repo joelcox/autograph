@@ -1,3 +1,4 @@
+// A package for signing and verifing Go structs.
 package autograph
 
 import (
@@ -6,38 +7,35 @@ import (
 	"errors"
 )
 
-type Manifest struct {
+// Contains a serialized message and corresponding signature.
+type Payload struct {
+	message   []byte
 	signature [32]byte
-	timestamp int
-	namespace string
 }
 
-type Payload interface {
+// Allows for serialization to a byte array of more complex structures.
+type Serializer interface {
 	Serialize() []byte
-	Manifest() Manifest
 }
 
-type StringPayload struct {
-	message string
-	Manifest
+// Creates a new signer from a struct implementing the Serializer interface.
+func NewSigner(s Serializer) *Payload {
+	return &Payload{message: s.Serialize()}
 }
 
-func (p *StringPayload) Serialize() []byte {
-	return []byte(p.message)
-}
-
-func (p *StringPayload) Sign(key []byte) (signature [32]byte) {
-	message := p.Serialize()
-	signature = sha256.Sum256(append(message[:], key[:]...))
-	p.Manifest.signature = signature
+// Signs a message by saving the corresponding signature to the payload.
+func (p *Payload) Sign(key []byte) (signature [32]byte) {
+	signature = sha256.Sum256(append(p.message[:], key[:]...))
+	p.signature = signature
 	return
 }
 
-func (p *StringPayload) Verify(key []byte) error {
-	message := p.Serialize()
-	signature := sha256.Sum256(append(message[:], key[:]...))
+// Verifies the message' signature by recomputing the signature and comparing
+// the byte array
+func (p *Payload) Verify(key []byte) error {
+	signature := sha256.Sum256(append(p.message[:], key[:]...))
 
-	if !bytes.Equal(p.Manifest.signature[:32], signature[:32]) {
+	if !bytes.Equal(p.signature[:32], signature[:32]) {
 		return errors.New("autograph: invalid signature")
 	}
 
