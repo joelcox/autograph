@@ -1,6 +1,8 @@
 Autograph
 =========
 
+[![Build Status](https://travis-ci.org/joelcox/autograph.svg?branch=master)](https://travis-ci.org/joelcox/autograph)
+
 A package for signing and verifying Go structs.
 
 Work in progress; except breaking changes!
