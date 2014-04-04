@@ -1,4 +1,4 @@
-// A package for signing and verifing Go structs.
+// A package for signing and verifying Go structs.
 package autograph
 
 import (
