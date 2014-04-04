@@ -1,8 +1,8 @@
 package autograph
 
 import (
-	"crypto/sha256"
 	"bytes"
+	"crypto/sha256"
 	"errors"
 )
 
